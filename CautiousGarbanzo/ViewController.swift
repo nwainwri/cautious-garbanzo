@@ -8,57 +8,62 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource{
+
+  
   
   @IBOutlet weak var mainNavBar: UIView!
   @IBOutlet weak var navBarHeightConstraint: NSLayoutConstraint!
   @IBOutlet weak var navBarPlusButton: UIButton!
   
+  @IBOutlet weak var mainTableView: UITableView!
+  
+  var snacks:Array<String>!
+  
+  var properPath: IndexPath!
+  
+  
   var isVertical = false
   var myStack: UIStackView!
+  
+  var snackTitleLabel: UILabel!
   
   override func viewDidLoad() {
     super.viewDidLoad()
     //    self.navBarPlusButton.imageView?.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi / 2))
     // Do any additional setup after loading the view, typically from a nib.
     
+    snacks = []
     
-    // MARK: testStack
-    //    let heightConstraintA = a.heightAnchor.constraint(equalToConstant: 120.0)
-    
-//    let buttonOne = UIButton(type: .system)
-//    buttonOne.setTitle("ONE", for: .normal)
-//
-//    let buttonTwo = UIButton(type: .system)
-//    buttonTwo.setTitle("TWO", for: .normal)
-//
-//    let buttonThreee = UIButton(type: .system)
-//    buttonThreee.setTitle("THREE", for: .normal)
-    
-
-    
+    // MARK: stackView
     let imageOne = UIImageView(image: #imageLiteral(resourceName: "oreos"))
     let imageTwo = UIImageView(image: #imageLiteral(resourceName: "pizza_pockets"))
     let imageThree = UIImageView(image: #imageLiteral(resourceName: "popsicle"))
     let imageFour = UIImageView(image: #imageLiteral(resourceName: "ramen"))
     let imageFive = UIImageView(image: #imageLiteral(resourceName: "pop_tarts"))
     
+    //MARK: snackTitleLabel
+//    let snackTitleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
+////    snackTitleLabel.center = CGPoint(x: 160, y: 285)
+//    snackTitleLabel.textAlignment = .center
+//    snackTitleLabel.text = "SNACKS"
+//    self.view.addSubview(label)
+
     
-    // The didTap: method will be defined in Step 3 below.
-    let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTap(sender:)))
+//    imageOne.heightAnchor.constraint(equalToConstant: 40) .isActive = true
+//    imageTwo.heightAnchor.constraint(equalToConstant: 40) .isActive = true
+//    imageThree.heightAnchor.constraint(equalToConstant: 40) .isActive = true
+//    imageFour.heightAnchor.constraint(equalToConstant: 40) .isActive = true
+//    imageFive.heightAnchor.constraint(equalToConstant: 40) .isActive = true
     
-    // Optionally set the number of required taps, e.g., 2 for a double click
-    tapGestureRecognizer.numberOfTapsRequired = 2
+    snackTitleLabel = UILabel(frame: .zero)
+    snackTitleLabel.text = "SNACKS"
+    snackTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+    mainNavBar.addSubview(snackTitleLabel)
+//    snackTitleLabel.bottomAnchor.constraint(equalTo: mainNavBar.bottomAnchor, constant: -120).isActive = true
+    snackTitleLabel.centerYAnchor.constraint(equalTo: mainNavBar.centerYAnchor, constant: -5).isActive = true
+    snackTitleLabel.centerXAnchor.constraint(equalTo: mainNavBar.centerXAnchor).isActive = true
     
-    // Attach it to a view of your choice. If it's a UIImageView, remember to enable user interaction
-    imageOne.isUserInteractionEnabled = true
-    imageOne.addGestureRecognizer(tapGestureRecognizer)
-    
-    
-    
-    
-    
-//    let myStack = UIStackView(arrangedSubviews: [buttonOne, buttonTwo, buttonThreee])
     
     myStack = UIStackView(arrangedSubviews: [imageOne, imageTwo, imageThree, imageFour, imageFive])
     
@@ -68,22 +73,60 @@ class ViewController: UIViewController {
     myStack.axis = .horizontal
     mainNavBar.addSubview(myStack)
     
-    imageOne.isUserInteractionEnabled = true
-
     
-    myStack.heightAnchor.constraint(equalToConstant: 100) .isActive = true
+    
+    
+    myStack.heightAnchor.constraint(equalToConstant: 90) .isActive = true
     myStack.leadingAnchor.constraint(equalTo: mainNavBar.leadingAnchor, constant: 8) .isActive = true
     myStack.trailingAnchor.constraint(equalTo: mainNavBar.trailingAnchor, constant: -8) .isActive = true
-//    myStack.topAnchor.constraint(equalTo: mainNavBar.topAnchor, constant: 80) .isActive = true
-    myStack.bottomAnchor.constraint(equalTo: mainNavBar.bottomAnchor, constant: -8) .isActive = true
+    //    myStack.topAnchor.constraint(equalTo: mainNavBar.topAnchor, constant: 80) .isActive = true
+    myStack.bottomAnchor.constraint(equalTo: mainNavBar.bottomAnchor, constant: -2) .isActive = true
     
     myStack.isHidden = true
+    myStack.spacing = 5
     
+    mainTableView.delegate = self
+    mainTableView.dataSource = self
     
+    let imageOneTap = UITapGestureRecognizer()
+  
+    imageOneTap.addTarget(self, action:#selector(imageOneTapped))
+    imageOneTap.numberOfTouchesRequired = 1
+    imageOneTap.numberOfTapsRequired = 1
+    imageOne.addGestureRecognizer(imageOneTap)
+    imageOne.isUserInteractionEnabled = true
     
+    let imageTwoTap = UITapGestureRecognizer()
     
+    imageTwoTap.addTarget(self, action:#selector(imageTwoTapped))
+    imageTwoTap.numberOfTouchesRequired = 1
+    imageTwoTap.numberOfTapsRequired = 1
+    imageTwo.addGestureRecognizer(imageTwoTap)
+    imageTwo.isUserInteractionEnabled = true
     
+    let imageThreeTap = UITapGestureRecognizer()
     
+    imageThreeTap.addTarget(self, action:#selector(imageThreeTapped))
+    imageThreeTap.numberOfTouchesRequired = 1
+    imageThreeTap.numberOfTapsRequired = 1
+    imageThree.addGestureRecognizer(imageThreeTap)
+    imageThree.isUserInteractionEnabled = true
+    
+    let imageFourTap = UITapGestureRecognizer()
+    
+    imageFourTap.addTarget(self, action:#selector(imageFourTapped))
+    imageFourTap.numberOfTouchesRequired = 1
+    imageFourTap.numberOfTapsRequired = 1
+    imageFour.addGestureRecognizer(imageFourTap)
+    imageFour.isUserInteractionEnabled = true
+    
+    let imageFiveTap = UITapGestureRecognizer()
+    
+    imageFiveTap.addTarget(self, action:#selector(imageFiveTapped))
+    imageFiveTap.numberOfTouchesRequired = 1
+    imageFiveTap.numberOfTapsRequired = 1
+    imageFive.addGestureRecognizer(imageFiveTap)
+    imageFive.isUserInteractionEnabled = true
     
     
     
@@ -99,7 +142,6 @@ class ViewController: UIViewController {
     // Dispose of any resources that can be recreated.
   }
   
-  
   @IBAction func navBarPlusButtonPressed(_ sender: UIButton) {
     sender.isSelected = !sender.isSelected
     sender.adjustsImageWhenHighlighted = false
@@ -114,7 +156,7 @@ class ViewController: UIViewController {
     let customView = sender
     let transform: CGAffineTransform = isVertical ? .identity : CGAffineTransform(rotationAngle:  CGFloat.pi/4)
     
-    UIView.animate(withDuration: 1, animations: {
+    UIView.animate(withDuration: 0.5, animations: {
       customView.transform =  transform
     }, completion: { (finished) in
       self.isVertical = !self.isVertical
@@ -140,35 +182,68 @@ class ViewController: UIViewController {
       self.navBarHeightConstraint.constant = newHeight // heightCon is the IBOutlet to the constraint
       self.view.layoutIfNeeded()
       self.myStack.isHidden = !sender.isSelected
+      
+      if !self.myStack.isHidden {
+        self.snackTitleLabel.text = "ADD A SNACK"
+      } else {
+        self.snackTitleLabel.text = "SNACKS"
+      }
       }})
-//    print("button pressed")
+    //    print("button pressed")
   }
   
   
+  //MARK: TAP GESTURE FUNCS
+  @objc func imageOneTapped() {
+    print("imageOneTapped")
+    snacks.append("Oreos")
+    print("TEST: \(snacks)")
+    mainTableView.reloadData()
+  }
   
+  @objc func imageTwoTapped() {
+    print("pizzapops ")
+    let indexPath = IndexPath(row: snacks.count, section: 0)
+    snacks.append("Pizza Pops")
+    print("TEST: \(snacks)")
+    // MARK: QUESTION mainTableView.insertRowsAtIndexPaths(properPath, withRowAnimation: UITableViewRowAnimation.bottom)
+    //mainTableView.reloadData()
+    mainTableView.insertRows(at: [indexPath], with: .automatic)
+  }
   
+  @objc func imageThreeTapped() {
+    print("popsciles ")
+    snacks.append("Popscicles")
+    print("TEST: \(snacks)")
+    mainTableView.reloadData()
+  }
   
+  @objc func imageFourTapped() {
+    print("ramen ")
+    snacks.append("Ramen")
+    print("TEST: \(snacks)")
+    mainTableView.reloadData()
+  }
   
-  
-  //MARK: custom funcs
-  @objc func didTap(sender: UITapGestureRecognizer) {
-    let location = sender.location(in: view)
-    // User tapped at the point above. Do something with that if you want.
+  @objc func imageFiveTapped() {
+    print("poptars ")
+    snacks.append("Poptarts")
+    print("TEST: \(snacks)")
+    mainTableView.reloadData()
   }
   
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  //MARK: TABLE VIEW FUNCS
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return snacks.count
+  }
+
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell = mainTableView.dequeueReusableCell(withIdentifier: "mainViewCell", for: indexPath)
+    properPath = indexPath
+    cell.textLabel?.text = snacks[indexPath.row]
+    return cell
+  }
   
   
 }

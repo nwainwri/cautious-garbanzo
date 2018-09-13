@@ -48,6 +48,7 @@
                     <connections>
                         <outlet property="mainNavBar" destination="XW2-D2-xxP" id="2pJ-Iv-IS4"/>
                         <outlet property="navBarHeightConstraint" destination="rsj-UB-KcF" id="lty-xr-1VO"/>
+                        <outlet property="navBarPlusButton" destination="keZ-n4-HG4" id="Kal-yV-VPU"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
